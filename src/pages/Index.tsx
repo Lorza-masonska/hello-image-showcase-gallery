@@ -11,10 +11,9 @@ const Index = () => {
             Hi
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Welcome to your personal image gallery! This is a simple and clean space where you can 
-            upload and organize your favorite images. Simply paste images directly from your clipboard 
-            or click to upload files from your device. Your gallery will automatically organize them 
-            in a beautiful grid layout.
+            Welcome to my personal photo gallery! Here you can view all the images 
+            from my curated collection. These photos are stored in a private GitHub 
+            repository and are displayed here for easy browsing.
           </p>
         </div>
 

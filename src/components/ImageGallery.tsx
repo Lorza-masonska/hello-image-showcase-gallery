@@ -70,10 +70,10 @@ const ImageGallery = () => {
   return (
     <div className="w-full max-w-6xl mx-auto">
       {images.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {images.map(image => (
             <Card key={image.id} className="overflow-hidden group relative">
-              <div className="aspect-square relative">
+              <div className="aspect-video relative">
                 <img
                   src={image.url}
                   alt={image.name}

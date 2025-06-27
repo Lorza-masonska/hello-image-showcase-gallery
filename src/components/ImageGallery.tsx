@@ -73,11 +73,11 @@ const ImageGallery = () => {
         <div className="grid grid-cols-4 gap-2">
           {images.map(image => (
             <Card key={image.id} className="overflow-hidden group relative">
-              <div className="aspect-[9/16] relative">
+              <div className="aspect-[9/16] relative bg-black flex items-center justify-center">
                 <img
                   src={image.url}
                   alt={image.name}
-                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                  className="max-w-full max-h-full object-contain transition-transform group-hover:scale-105"
                   loading="lazy"
                 />
               </div>

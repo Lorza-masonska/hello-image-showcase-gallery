@@ -1,4 +1,3 @@
-
 import React from 'react';
 import NavigationBar from '@/components/NavigationBar';
 
@@ -14,14 +13,14 @@ const Website = () => {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="prose max-w-none">
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                Stworzyłem tę stronę, aby pokazać światu, co mnie śmieszy. To miejsce to moje dzieło, tworzone z pasji do programowania, ale też zwyczajnie z nudów. Chciałem mieć przestrzeń, w której mogę zbierać i publikować memy oraz obrazy, które uważam za zabawne, dziwne albo po prostu warte pokazania.
-
-Nie zależało mi na robieniu czegoś profesjonalnego czy perfekcyjnego. Zależało mi na autentyczności. Ta strona to coś osobistego – galeria mojego humoru i spojrzenia na internetowy śmietnik obrazków.
-
-Nie znajdziesz tu reklam, niepotrzebnych dodatków ani algorytmów wybierających, co masz zobaczyć. Wszystko, co jest na stronie, dodałem ręcznie, bo mnie to bawi albo wywołuje jakiś dziwny rodzaj satysfakcji.
-
-Projekt rozwijam na bieżąco – dorzucam nowe rzeczy, zmieniam układ, poprawiam szczegóły. To ciągle żyje i trochę też ewoluuje razem ze mną. Jeśli kogoś to rozbawi – super. Jeśli nie – też okej. Strona powstała głównie dla mnie, ale jeśli ktoś się na niej uśmiechnie, to tylko lepiej.
-              </p>
+                Stworzyłem tę stronę, aby pokazać światu, co mnie śmieszy. To miejsce to moje dzieło, tworzone z pasji do programowania, ale też zwyczajnie z nudów. Chciałem mieć przestrzeń na własne pomysły i żarty.
+                <br /><br />
+                Nie zależało mi na robieniu czegoś profesjonalnego czy perfekcyjnego. Zależało mi na autentyczności. Ta strona to coś osobistego – galeria mojego humoru i spojrzenia na internetowy śmietnik memów.
+                <br /><br />
+                Nie znajdziesz tu reklam, niepotrzebnych dodatków ani algorytmów wybierających, co masz zobaczyć. Wszystko, co jest na stronie, dodałem ręcznie, bo mnie to bawi albo wywołuje jakiś dziwny rodzaj nostalgii.
+                <br /><br />
+                Projekt rozwijam na bieżąco – dorzucam nowe rzeczy, zmieniam układ, poprawiam szczegóły. To ciągle żyje i trochę też ewoluuje razem ze mną. Jeśli kogoś to rozbawi – super. Jeśli nie – też w porządku!
+                {/* Uzupełnij lub zmodyfikuj treść według własnych potrzeb */}
               </p>
             </div>
           </div>

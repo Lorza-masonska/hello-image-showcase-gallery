@@ -10,12 +10,13 @@ const Index = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-6xl font-bold text-gray-800 mb-4 animate-fade-in">
-            Hi
+            Witaj!
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Welcome to my personal photo gallery! Here you can view all the images 
-            from my curated collection. These photos are stored in a private GitHub 
-            repository and are displayed here for easy browsing.
+            Bardzo się cieszę że mnie odwiedziłeś na tej stronie. Tutaj, drogi użytkowniku,
+  znajdziesz wszystkie cursed images i memy, które kiedykolwiek wstawiłem lub też nie. 
+  Strona jest regularnie update'owana więc jeżeli czegoś nie ma, to za jakiś czas się pojawi. 
+  Miłego oglądania
           </p>
         </div>
 

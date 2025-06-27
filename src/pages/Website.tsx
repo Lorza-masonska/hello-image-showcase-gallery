@@ -9,31 +9,19 @@ const Website = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-800 mb-6 text-center">
-            About This Website
+            O Tej Stronie
           </h1>
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="prose max-w-none">
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                This website was built using modern web technologies to provide a seamless 
-                and responsive experience for viewing my photo collection. The gallery 
-                automatically fetches images from my private GitHub repository, ensuring 
-                that new photos are always up to date.
-              </p>
-              
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Features</h2>
-              <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                <li>Responsive grid layout that adapts to different screen sizes</li>
-                <li>Full-screen preview mode with navigation controls</li>
-                <li>Automatic image loading from GitHub repository</li>
-                <li>Clean, modern design focused on showcasing the photography</li>
-                <li>Fast loading times and optimized performance</li>
-              </ul>
+                Stworzyłem tę stronę, aby pokazać światu, co mnie śmieszy. To miejsce to moje dzieło, tworzone z pasji do programowania, ale też zwyczajnie z nudów. Chciałem mieć przestrzeń, w której mogę zbierać i publikować memy oraz obrazy, które uważam za zabawne, dziwne albo po prostu warte pokazania.
 
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Technology Stack</h2>
-              <p className="text-lg text-gray-700 leading-relaxed">
-                Built with React, TypeScript, and Tailwind CSS for a modern, maintainable, 
-                and visually appealing experience. The site is hosted and automatically 
-                deployed to ensure reliability and fast global access.
+Nie zależało mi na robieniu czegoś profesjonalnego czy perfekcyjnego. Zależało mi na autentyczności. Ta strona to coś osobistego – galeria mojego humoru i spojrzenia na internetowy śmietnik obrazków.
+
+Nie znajdziesz tu reklam, niepotrzebnych dodatków ani algorytmów wybierających, co masz zobaczyć. Wszystko, co jest na stronie, dodałem ręcznie, bo mnie to bawi albo wywołuje jakiś dziwny rodzaj satysfakcji.
+
+Projekt rozwijam na bieżąco – dorzucam nowe rzeczy, zmieniam układ, poprawiam szczegóły. To ciągle żyje i trochę też ewoluuje razem ze mną. Jeśli kogoś to rozbawi – super. Jeśli nie – też okej. Strona powstała głównie dla mnie, ale jeśli ktoś się na niej uśmiechnie, to tylko lepiej.
+              </p>
               </p>
             </div>
           </div>

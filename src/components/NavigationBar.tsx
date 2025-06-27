@@ -16,20 +16,39 @@ const NavigationBar = () => {
   return (
     <nav className="bg-white shadow-sm border-b">
       <div className="container mx-auto px-4">
-        <div className="flex justify-center space-x-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
-              className={`py-4 px-6 text-lg font-medium transition-colors ${
-                isActive(item.path)
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
+        <div className="flex justify-between items-center">
+          <Link
+            to="/about"
+            className={`py-4 px-6 text-lg font-medium transition-colors ${
+              isActive('/about')
+                ? 'text-black border-b-2 border-black'
+                : 'text-gray-600 hover:text-black'
+            }`}
+          >
+            About Me
+          </Link>
+          
+          <Link
+            to="/"
+            className={`py-4 px-6 text-lg font-medium transition-colors ${
+              isActive('/')
+                ? 'text-black border-b-2 border-black'
+                : 'text-gray-600 hover:text-black'
+            }`}
+          >
+            Gallery
+          </Link>
+          
+          <Link
+            to="/website"
+            className={`py-4 px-6 text-lg font-medium transition-colors ${
+              isActive('/website')
+                ? 'text-black border-b-2 border-black'
+                : 'text-gray-600 hover:text-black'
+            }`}
+          >
+            Website
+          </Link>
         </div>
       </div>
     </nav>

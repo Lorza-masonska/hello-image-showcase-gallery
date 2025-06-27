@@ -13,9 +13,9 @@ const About = () => {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="prose max-w-none">
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                Cześć, jestem Lorza. Bardzo lubię memy i informatykę. W wolnym czasie grzebię przy projektach webowych, uczę się nowych technologii i kombinuję, jak coś zbudować albo zepsuć[...]<br />
+                Cześć, jestem Lorza. Bardzo lubię memy i informatykę. W wolnym czasie grzebię przy projektach webowych, uczę się nowych technologii i kombinuję, jak coś zbudować albo zepsuć dla nauki. Mam TikToka, na którego od czasu do czasu wrzucam jakieś rzeczy – czasem śmieszne, czasem dziwne, czasem po prostu z nudów.<br />
                 <br />
-                Nie traktuję siebie przesadnie serio, ale lubię mieć miejsce, w którym mogę coś pokazać — czy to memy, czy jakiś mały projekt, który zrobiłem. Ta strona to jedna z takich rzeczy. Połącz[...]<br />
+                Nie traktuję siebie przesadnie serio, ale lubię mieć miejsce, w którym mogę coś pokazać — czy to memy, czy jakiś mały projekt, który zrobiłem. Ta strona to jedna z takich rzeczy. Połączenie mojego poczucia humoru i zajawki na kod.<br />
                 <br />
                 Jeśli też siedzisz w memach, informatyce, albo po prostu lubisz się pośmiać z czegoś głupiego — to dobrze trafiłeś.
               </p>

@@ -36,7 +36,7 @@ const NavigationBar = () => {
                 : 'text-gray-600 hover:text-black'
             }`}
           >
-            Gallery
+            Główna/Galeria
           </Link>
           
           <Link
@@ -47,7 +47,7 @@ const NavigationBar = () => {
                 : 'text-gray-600 hover:text-black'
             }`}
           >
-            Website
+            O stronie
           </Link>
         </div>
       </div>

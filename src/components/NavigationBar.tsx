@@ -8,9 +8,9 @@ const NavigationBar = () => {
   const isActive = (path: string) => location.pathname === path;
   
   const navItems = [
-    { name: 'O mnie', path: '/about' },
-    { name: 'Główna / Galeria', path: '/' },
-    { name: 'O stronie', path: '/website' }
+    { name: 'About Me', path: '/about' },
+    { name: 'Gallery', path: '/' },
+    { name: 'Website', path: '/website' }
   ];
 
   return (
@@ -25,7 +25,7 @@ const NavigationBar = () => {
                 : 'text-gray-600 hover:text-black'
             }`}
           >
-            About Me
+            O mnie
           </Link>
           
           <Link

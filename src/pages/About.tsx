@@ -14,21 +14,12 @@ const About = () => {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="prose max-w-none">
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                Welcome to my personal space! I'm passionate about photography and capturing 
-                moments that tell stories. Through my lens, I explore the world around me 
-                and share these experiences with others.
-              </p>
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                This gallery represents a collection of my favorite captures, each image 
-                carefully selected to showcase different perspectives and emotions. Whether 
-                it's landscapes, portraits, or everyday moments, I believe every photograph 
-                has its own unique narrative.
-              </p>
-              <p className="text-lg text-gray-700 leading-relaxed">
-                Feel free to browse through my gallery and experience these visual stories. 
-                I hope you find something that resonates with you and brings a moment of 
-                joy or contemplation to your day.
-              </p>
+                Cześć, jestem Lorza. Bardzo lubię memy i informatykę. W wolnym czasie grzebię przy projektach webowych, uczę się nowych technologii i kombinuję, jak coś zbudować albo zepsuć dla nauki. Mam TikToka, na którego od czasu do czasu wrzucam jakieś rzeczy – czasem śmieszne, czasem dziwne, czasem po prostu z nudów.
+
+Nie traktuję siebie przesadnie serio, ale lubię mieć miejsce, w którym mogę coś pokazać — czy to memy, czy jakiś mały projekt, który zrobiłem. Ta strona to jedna z takich rzeczy. Połączenie mojego poczucia humoru i zajawki na kod.
+
+Jeśli też siedzisz w memach, informatyce, albo po prostu lubisz się pośmiać z czegoś głupiego — to dobrze trafiłeś.
+              </p
             </div>
           </div>
         </div>

@@ -8,9 +8,9 @@ const NavigationBar = () => {
   const isActive = (path: string) => location.pathname === path;
   
   const navItems = [
-    { name: 'About Me', path: '/about' },
-    { name: 'Gallery', path: '/' },
-    { name: 'Website', path: '/website' }
+    { name: 'O mnie', path: '/about' },
+    { name: 'Główna / Galeria', path: '/' },
+    { name: 'O stronie', path: '/website' }
   ];
 
   return (

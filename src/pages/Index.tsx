@@ -1,6 +1,7 @@
 
 import ImageGallery from "@/components/ImageGallery";
 import NavigationBar from "@/components/NavigationBar";
+import { Separator } from "@/components/ui/separator";
 
 const Index = () => {
   return (
@@ -23,6 +24,24 @@ const Index = () => {
         {/* Image Gallery */}
         <div className="mt-12">
           <ImageGallery />
+        </div>
+
+        {/* Footer */}
+        <div className="mt-16 pb-8">
+          <Separator className="mb-6" />
+          <div className="text-center text-sm text-gray-600 space-y-2">
+            <div>
+              <span className="font-medium">Wersja:</span> 16390e8
+            </div>
+            <div>
+              <span className="font-medium">Kontakt:</span>
+            </div>
+            <div className="space-y-1">
+              <div>Discord: treexno_</div>
+              <div>TikTok: @lorza_masonska</div>
+              <div>Instagram: lorzamasonska_</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

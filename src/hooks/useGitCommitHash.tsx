@@ -8,8 +8,8 @@ export const useGitCommitHash = () => {
   useEffect(() => {
     const fetchCommitHash = async () => {
       try {
-        // Pobierz najnowszy commit z głównej gałęzi
-        const response = await fetch('https://api.github.com/repos/Lorza-masonska/Zdjecia/commits/main');
+        // Pobierz najnowszy commit z domyślnej gałęzi (bez określania konkretnej gałęzi)
+        const response = await fetch('https://api.github.com/repos/Lorza-masonska/Zdjecia/commits?per_page=1');
         
         if (response.status === 403) {
           const errorData = await response.json();
@@ -25,10 +25,14 @@ export const useGitCommitHash = () => {
           throw new Error('Failed to fetch commit data');
         }
         
-        const commitData = await response.json();
-        // Skróć hash do 7 znaków (standardowa długość)
-        const shortHash = commitData.sha.substring(0, 7);
-        setCommitHash(shortHash);
+        const commits = await response.json();
+        if (commits && commits.length > 0) {
+          // Skróć hash do 7 znaków (standardowa długość)
+          const shortHash = commits[0].sha.substring(0, 7);
+          setCommitHash(shortHash);
+        } else {
+          setCommitHash('no-commits');
+        }
       } catch (error) {
         console.error('Error fetching commit hash:', error);
         setCommitHash('unknown');

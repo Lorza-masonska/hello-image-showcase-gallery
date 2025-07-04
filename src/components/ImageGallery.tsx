@@ -14,6 +14,7 @@ const ImageGallery = () => {
   const [error, setError] = useState<string | null>(null);
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
 
   const fetchImages = async (showRefreshIndicator = false) => {
     try {
@@ -24,6 +25,16 @@ const ImageGallery = () => {
       // Dodaj timestamp do URL żeby uniknąć cache
       const timestamp = new Date().getTime();
       const response = await fetch(`https://api.github.com/repos/Lorza-masonska/Zdjecia/contents?t=${timestamp}`);
+      
+      if (response.status === 403) {
+        const errorData = await response.json();
+        if (errorData.message.includes('rate limit')) {
+          console.log('GitHub API rate limit reached. Waiting...');
+          setRateLimited(true);
+          setError('Osiągnięto limit API GitHub. Odczekaj chwilę przed odświeżeniem.');
+          return;
+        }
+      }
         
       if (!response.ok) {
         throw new Error('Failed to fetch images from repository');
@@ -45,6 +56,7 @@ const ImageGallery = () => {
         
       setImages(imageFiles);
       setError(null);
+      setRateLimited(false);
     } catch (err) {
       console.error('Error fetching images:', err);
       setError('Failed to load images from repository');
@@ -59,15 +71,18 @@ const ImageGallery = () => {
   useEffect(() => {
     fetchImages();
     
-    // Automatyczne odświeżanie co 30 sekund
+    // Zmniejsz częstotliwość automatycznego odświeżania z 30s na 5 minut
     const interval = setInterval(() => {
-      fetchImages();
-    }, 30000);
+      if (!rateLimited) {
+        fetchImages();
+      }
+    }, 300000); // 5 minut
     
     return () => clearInterval(interval);
-  }, []);
+  }, [rateLimited]);
 
   const handleManualRefresh = () => {
+    setRateLimited(false);
     fetchImages(true);
   };
 
@@ -127,6 +142,11 @@ const ImageGallery = () => {
     return (
       <div className="text-center py-12">
         <p className="text-red-500 mb-4">{error}</p>
+        {rateLimited && (
+          <p className="text-yellow-600 mb-4 text-sm">
+            Tip: GitHub API pozwala na 60 żądań na godzinę. Spróbuj ponownie za chwilę.
+          </p>
+        )}
         <button
           onClick={handleManualRefresh}
           disabled={refreshing}

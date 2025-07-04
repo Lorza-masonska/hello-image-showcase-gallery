@@ -11,6 +11,16 @@ export const useGitCommitHash = () => {
         // Pobierz najnowszy commit z głównej gałęzi
         const response = await fetch('https://api.github.com/repos/Lorza-masonska/Zdjecia/commits/main');
         
+        if (response.status === 403) {
+          const errorData = await response.json();
+          if (errorData.message.includes('rate limit')) {
+            console.log('GitHub API rate limit reached for commit hash');
+            setCommitHash('rate-limited');
+            setLoading(false);
+            return;
+          }
+        }
+        
         if (!response.ok) {
           throw new Error('Failed to fetch commit data');
         }

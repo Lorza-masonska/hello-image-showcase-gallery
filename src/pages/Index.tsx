@@ -2,8 +2,11 @@
 import ImageGallery from "@/components/ImageGallery";
 import NavigationBar from "@/components/NavigationBar";
 import { Separator } from "@/components/ui/separator";
+import { useGitCommitHash } from "@/hooks/useGitCommitHash";
 
 const Index = () => {
+  const { commitHash, loading } = useGitCommitHash();
+
   return (
     <div className="min-h-screen bg-sky-50">
       <NavigationBar />
@@ -31,7 +34,7 @@ const Index = () => {
           <Separator className="mb-6" />
           <div className="text-center text-sm text-gray-600 space-y-2">
             <div>
-              <span className="font-medium">Wersja:</span> 16390e8
+              <span className="font-medium">Wersja:</span> {loading ? 'ładowanie...' : commitHash}
             </div>
             <div>
               <span className="font-medium">Kontakt:</span>

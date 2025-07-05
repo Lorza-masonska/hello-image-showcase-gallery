@@ -9,7 +9,9 @@ export const useGitCommitHash = () => {
   useEffect(() => {
     const fetchCommitHash = async () => {
       try {
+        console.log('=== useGitCommitHash: Fetching hash ===');
         const hash = await commitHashService.getLatestCommitHash();
+        console.log('useGitCommitHash: Received hash:', hash);
         setCommitHash(hash);
       } catch (error) {
         console.error('Error in useGitCommitHash:', error);
@@ -22,12 +24,16 @@ export const useGitCommitHash = () => {
     // Pierwsze pobranie
     fetchCommitHash();
     
-    // Sprawdzaj co 3 minuty
+    // Sprawdzaj co 30 sekund dla testów (później można zwiększyć)
     const interval = setInterval(() => {
+      console.log('=== Interval check ===');
       fetchCommitHash();
-    }, 3 * 60 * 1000);
+    }, 30 * 1000);
     
-    return () => clearInterval(interval);
+    return () => {
+      console.log('Cleaning up commit hash interval');
+      clearInterval(interval);
+    };
   }, []);
 
   return { commitHash, loading };

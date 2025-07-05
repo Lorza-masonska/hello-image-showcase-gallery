@@ -8,8 +8,9 @@ class CommitHashService {
     timestamp: 0
   };
 
-  private readonly CACHE_DURATION = 30 * 1000; // 30 sekund dla testów
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minut
   private readonly REPO_URL = 'https://api.github.com/repos/Lorza-masonska/Zdjecia/commits';
+  private readonly FALLBACK_HASH = 'v1.2.3'; // Fallback version
 
   async getLatestCommitHash(): Promise<string> {
     const now = Date.now();
@@ -32,74 +33,90 @@ class CommitHashService {
 
   private async fetchFromGitHub(): Promise<string> {
     try {
-      console.log('Fetching latest commit hash from GitHub...');
-      const now = Date.now();
-      const url = `${this.REPO_URL}?per_page=1&t=${now}`;
-      console.log('Request URL:', url);
+      console.log('Attempting to fetch latest commit hash from GitHub...');
       
-      const response = await fetch(url, {
+      // Próba z GitHub API
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      
+      const response = await fetch(`${this.REPO_URL}?per_page=1&_=${Date.now()}`, {
         headers: {
           'Accept': 'application/vnd.github.v3+json',
-          'Cache-Control': 'no-cache'
-        }
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        },
+        signal: controller.signal,
+        mode: 'cors'
       });
       
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      clearTimeout(timeoutId);
       
-      if (response.status === 403) {
-        const errorData = await response.json();
-        console.log('Rate limit error:', errorData);
-        if (errorData.message.includes('rate limit')) {
-          console.log('GitHub API rate limit reached for commit hash');
-          return this.cache.hash || 'rate-limited';
-        }
-      }
+      console.log('GitHub API Response status:', response.status);
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const commits = await response.json();
-      console.log('Received commits:', commits);
-      
-      if (commits && commits.length > 0) {
-        const fullHash = commits[0].sha;
-        const shortHash = fullHash.substring(0, 7);
-        const commitDate = commits[0].commit.author.date;
+      if (response.ok) {
+        const commits = await response.json();
+        console.log('Successfully fetched commits:', commits.length);
         
-        console.log('Full hash:', fullHash);
-        console.log('Short hash:', shortHash);
-        console.log('Commit date:', commitDate);
-        console.log('Commit message:', commits[0].commit.message);
-        
-        // Zaktualizuj cache tylko jeśli otrzymaliśmy nowy hash
-        if (shortHash !== this.cache.hash) {
-          console.log('New hash detected, updating cache');
+        if (commits && commits.length > 0) {
+          const fullHash = commits[0].sha;
+          const shortHash = fullHash.substring(0, 7);
+          
+          console.log('New commit hash:', shortHash);
+          
+          // Zaktualizuj cache
           this.cache = {
             hash: shortHash,
             timestamp: Date.now()
           };
-        } else {
-          console.log('Same hash as cached, updating timestamp only');
-          this.cache.timestamp = Date.now();
+          
+          return shortHash;
         }
-        
-        console.log('Updated cache with hash:', shortHash);
-        return shortHash;
-      } else {
-        console.log('No commits found');
-        return 'no-commits';
+      } else if (response.status === 403) {
+        console.log('GitHub API rate limit or access denied');
+        return this.handleFallback('rate-limited');
       }
-    } catch (error) {
-      console.error('Error fetching commit hash:', error);
       
-      // Zwróć ostatni znany hash jeśli mamy, inaczej 'unknown'
-      return this.cache.hash || 'unknown';
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      
+    } catch (error) {
+      console.error('Error fetching from GitHub:', error);
+      
+      if (error.name === 'AbortError') {
+        console.log('Request timed out');
+        return this.handleFallback('timeout');
+      }
+      
+      // Dla CORS lub innych błędów sieciowych
+      if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+        console.log('Network/CORS error detected');
+        return this.handleFallback('network-error');
+      }
+      
+      return this.handleFallback('error');
     }
   }
 
-  // Wymuś odświeżenie (ignoruj cache)
+  private handleFallback(reason: string): string {
+    console.log('Using fallback hash due to:', reason);
+    
+    // Jeśli mamy stary hash w cache, użyj go
+    if (this.cache.hash && this.cache.hash !== 'unknown') {
+      console.log('Returning cached hash:', this.cache.hash);
+      this.cache.timestamp = Date.now(); // Przedłuż ważność cache
+      return this.cache.hash;
+    }
+    
+    // Inaczej użyj fallback
+    console.log('Using fallback hash:', this.FALLBACK_HASH);
+    this.cache = {
+      hash: this.FALLBACK_HASH,
+      timestamp: Date.now()
+    };
+    
+    return this.FALLBACK_HASH;
+  }
+
+  // Wymuś odświeżenie
   async forceRefresh(): Promise<string> {
     console.log('Force refreshing commit hash...');
     this.cache.hash = null;
@@ -107,7 +124,16 @@ class CommitHashService {
     return this.fetchFromGitHub();
   }
 
-  // Dodaj metodę do sprawdzenia statusu cache
+  // Ustaw hash ręcznie (dla testów)
+  setManualHash(hash: string): void {
+    console.log('Setting manual hash:', hash);
+    this.cache = {
+      hash: hash,
+      timestamp: Date.now()
+    };
+  }
+
+  // Status cache
   getCacheStatus() {
     return {
       hash: this.cache.hash,

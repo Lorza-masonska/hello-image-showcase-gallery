@@ -8,7 +8,7 @@ class CommitHashService {
     timestamp: 0
   };
 
-  private readonly CACHE_DURATION = 30 * 1000; // Zmniejszmy do 30 sekund dla testów
+  private readonly CACHE_DURATION = 30 * 1000; // 30 sekund dla testów
   private readonly REPO_URL = 'https://api.github.com/repos/Lorza-masonska/Zdjecia/commits';
 
   async getLatestCommitHash(): Promise<string> {
@@ -27,12 +27,23 @@ class CommitHashService {
       return this.cache.hash;
     }
 
+    return this.fetchFromGitHub();
+  }
+
+  private async fetchFromGitHub(): Promise<string> {
     try {
       console.log('Fetching latest commit hash from GitHub...');
+      const now = Date.now();
       const url = `${this.REPO_URL}?per_page=1&t=${now}`;
       console.log('Request URL:', url);
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
       console.log('Response status:', response.status);
       console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
@@ -62,13 +73,19 @@ class CommitHashService {
         console.log('Commit date:', commitDate);
         console.log('Commit message:', commits[0].commit.message);
         
-        // Zaktualizuj cache
-        this.cache = {
-          hash: shortHash,
-          timestamp: now
-        };
+        // Zaktualizuj cache tylko jeśli otrzymaliśmy nowy hash
+        if (shortHash !== this.cache.hash) {
+          console.log('New hash detected, updating cache');
+          this.cache = {
+            hash: shortHash,
+            timestamp: Date.now()
+          };
+        } else {
+          console.log('Same hash as cached, updating timestamp only');
+          this.cache.timestamp = Date.now();
+        }
         
-        console.log('Updated cache with new hash:', shortHash);
+        console.log('Updated cache with hash:', shortHash);
         return shortHash;
       } else {
         console.log('No commits found');
@@ -87,7 +104,7 @@ class CommitHashService {
     console.log('Force refreshing commit hash...');
     this.cache.hash = null;
     this.cache.timestamp = 0;
-    return this.getLatestCommitHash();
+    return this.fetchFromGitHub();
   }
 
   // Dodaj metodę do sprawdzenia statusu cache

@@ -6,28 +6,31 @@ export const useGitCommitHash = () => {
   const [commitHash, setCommitHash] = useState<string>('loading...');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchCommitHash = async () => {
-      try {
-        console.log('=== useGitCommitHash: Fetching hash ===');
-        const hash = await commitHashService.getLatestCommitHash();
-        console.log('useGitCommitHash: Received hash:', hash);
-        setCommitHash(hash);
-      } catch (error) {
-        console.error('Error in useGitCommitHash:', error);
-        setCommitHash('unknown');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchCommitHash = async (forceRefresh = false) => {
+    setLoading(true);
+    try {
+      console.log('=== useGitCommitHash: Fetching hash ===', { forceRefresh });
+      const hash = forceRefresh 
+        ? await commitHashService.forceRefresh() 
+        : await commitHashService.getLatestCommitHash();
+      console.log('useGitCommitHash: Received hash:', hash);
+      setCommitHash(hash);
+    } catch (error) {
+      console.error('Error in useGitCommitHash:', error);
+      setCommitHash('unknown');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Pierwsze pobranie
-    fetchCommitHash();
+  useEffect(() => {
+    // Pierwsze pobranie z wymuszeniem odświeżenia
+    fetchCommitHash(true);
     
     // Sprawdzaj co 30 sekund dla testów (później można zwiększyć)
     const interval = setInterval(() => {
       console.log('=== Interval check ===');
-      fetchCommitHash();
+      fetchCommitHash(false);
     }, 30 * 1000);
     
     return () => {
@@ -36,5 +39,10 @@ export const useGitCommitHash = () => {
     };
   }, []);
 
-  return { commitHash, loading };
+  const forceRefresh = () => {
+    console.log('Force refresh requested by user');
+    fetchCommitHash(true);
+  };
+
+  return { commitHash, loading, forceRefresh };
 };

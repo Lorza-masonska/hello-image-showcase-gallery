@@ -8,10 +8,10 @@ const NavigationBar = () => {
   const isActive = (path: string) => location.pathname === path;
   
   const navItems = [
-    { name: 'About Me', path: '/about' },
-    { name: 'Gallery', path: '/' },
-    { name: 'Website', path: '/website' },
-    { name: 'Community Memy', path: '/community-memes' }
+    { name: 'O mnie', path: '/about' },
+    { name: 'Główna', path: '/' },
+    { name: 'Community Memy', path: '/community-memes' },
+    { name: 'O stronie', path: '/website' }
   ];
 
   return (
@@ -41,17 +41,6 @@ const NavigationBar = () => {
           </Link>
           
           <Link
-            to="/website"
-            className={`py-4 px-6 text-lg font-medium transition-colors ${
-              isActive('/website')
-                ? 'text-black border-b-2 border-black'
-                : 'text-gray-600 hover:text-black'
-            }`}
-          >
-            O stronie
-          </Link>
-          
-          <Link
             to="/community-memes"
             className={`py-4 px-6 text-lg font-medium transition-colors ${
               isActive('/community-memes')
@@ -60,6 +49,17 @@ const NavigationBar = () => {
             }`}
           >
             Community Memy
+          </Link>
+          
+          <Link
+            to="/website"
+            className={`py-4 px-6 text-lg font-medium transition-colors ${
+              isActive('/website')
+                ? 'text-black border-b-2 border-black'
+                : 'text-gray-600 hover:text-black'
+            }`}
+          >
+            O stronie
           </Link>
         </div>
       </div>

@@ -14,7 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      community_memes: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_anonymous: boolean
+          nickname: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_anonymous?: boolean
+          nickname?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_anonymous?: boolean
+          nickname?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

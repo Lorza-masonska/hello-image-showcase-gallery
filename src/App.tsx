@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Website from "./pages/Website";
+import CommunityMemes from "./pages/CommunityMemes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/website" element={<Website />} />
+          <Route path="/community-memes" element={<CommunityMemes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

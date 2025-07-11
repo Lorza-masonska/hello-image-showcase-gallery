@@ -73,6 +73,42 @@ const CommunityMemes = () => {
     setUploading(true);
 
     try {
+      // Convert image to base64 for verification
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          const base64 = result.split(',')[1]; // Remove data:image/...;base64, prefix
+          resolve(base64);
+        };
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(selectedFile);
+      
+      const imageBase64 = await base64Promise;
+
+      // Verify image content
+      toast({
+        title: "Weryfikacja",
+        description: "Sprawdzam zawartość obrazka...",
+      });
+
+      const { data: verificationResult, error: verificationError } = await supabase.functions
+        .invoke('verify-meme', {
+          body: { imageBase64 }
+        });
+
+      if (verificationError) throw verificationError;
+
+      if (!verificationResult.approved) {
+        toast({
+          title: "Mem odrzucony",
+          description: `Zawartość nieodpowiednia: ${verificationResult.reason || 'Nieodpowiednia treść'}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Upload file to storage
       const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
@@ -101,7 +137,7 @@ const CommunityMemes = () => {
 
       toast({
         title: "Sukces!",
-        description: "Mem został dodany"
+        description: "Mem został zweryfikowany i dodany pomyślnie"
       });
 
       // Reset form

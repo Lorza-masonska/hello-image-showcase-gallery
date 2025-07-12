@@ -29,61 +29,104 @@ serve(async (req) => {
       );
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a content moderator. Analyze the image and determine if it contains inappropriate content such as: explicit sexual content, self-harm, violence, hate speech, or other harmful material. Respond with only "APPROVED" if the content is safe, or "REJECTED" followed by a brief reason if inappropriate.'
-          },
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: 'Please analyze this meme image for inappropriate content.'
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: `data:image/jpeg;base64,${imageBase64}`
+    console.log('Received image verification request');
+
+    // Fallback: if something goes wrong with AI verification, we'll approve by default
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a content moderator. Analyze the image and determine if it contains inappropriate content such as: explicit sexual content, self-harm, violence, hate speech, or other harmful material. Respond with only "APPROVED" if the content is safe, or "REJECTED" followed by a brief reason if inappropriate.'
+            },
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Please analyze this meme image for inappropriate content.'
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:image/jpeg;base64,${imageBase64}`
+                  }
                 }
-              }
-            ]
+              ]
+            }
+          ],
+          max_tokens: 100
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('OpenAI API error:', response.status, response.statusText);
+        // Fallback: approve if API fails
+        return new Response(
+          JSON.stringify({ 
+            approved: true,
+            reason: null,
+            fallback: true
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
           }
-        ],
-        max_tokens: 100
-      }),
-    });
-
-    const data = await response.json();
-    
-    console.log('OpenAI response:', JSON.stringify(data));
-    
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error('Invalid response from OpenAI API');
-    }
-    
-    const result = data.choices[0].message.content.trim();
-    
-    const isApproved = result.startsWith('APPROVED');
-    const reason = isApproved ? null : result.replace('REJECTED', '').trim();
-
-    return new Response(
-      JSON.stringify({ 
-        approved: isApproved,
-        reason: reason 
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        );
       }
-    );
+
+      const data = await response.json();
+      console.log('OpenAI response:', JSON.stringify(data, null, 2));
+      
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        console.error('Invalid OpenAI response structure');
+        // Fallback: approve if response is invalid
+        return new Response(
+          JSON.stringify({ 
+            approved: true,
+            reason: null,
+            fallback: true
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      const result = data.choices[0].message.content.trim();
+      const isApproved = result.startsWith('APPROVED');
+      const reason = isApproved ? null : result.replace('REJECTED', '').trim();
+
+      return new Response(
+        JSON.stringify({ 
+          approved: isApproved,
+          reason: reason 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+
+    } catch (aiError) {
+      console.error('AI verification error:', aiError);
+      // Fallback: approve if AI verification fails
+      return new Response(
+        JSON.stringify({ 
+          approved: true,
+          reason: null,
+          fallback: true
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
 
   } catch (error) {
     console.error('Error in verify-meme function:', error);

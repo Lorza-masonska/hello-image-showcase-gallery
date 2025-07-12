@@ -1,1 +1,4 @@
 project_id = "movyoqalilebfrfopwnw"
+
+[functions.verify-meme]
+verify_jwt = false

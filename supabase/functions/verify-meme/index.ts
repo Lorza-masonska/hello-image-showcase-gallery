@@ -63,6 +63,13 @@ serve(async (req) => {
     });
 
     const data = await response.json();
+    
+    console.log('OpenAI response:', JSON.stringify(data));
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response from OpenAI API');
+    }
+    
     const result = data.choices[0].message.content.trim();
     
     const isApproved = result.startsWith('APPROVED');

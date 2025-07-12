@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Upload, Image as ImageIcon } from 'lucide-react';
 import NavigationBar from '@/components/NavigationBar';
 
 interface Meme {
@@ -73,43 +73,6 @@ const CommunityMemes = () => {
     setUploading(true);
 
     try {
-      // Convert image to base64 for verification
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          const base64 = result.split(',')[1]; // Remove data:image/...;base64, prefix
-          resolve(base64);
-        };
-        reader.onerror = reject;
-      });
-      reader.readAsDataURL(selectedFile);
-      
-      const imageBase64 = await base64Promise;
-
-      // Verify image content
-      toast({
-        title: "Weryfikacja",
-        description: "Sprawdzam zawartość obrazka...",
-      });
-
-      const { data: verificationResult, error: verificationError } = await supabase.functions
-        .invoke('verify-meme', {
-          body: { imageBase64 }
-        });
-
-      if (verificationError) throw verificationError;
-
-      if (!verificationResult.approved) {
-        toast({
-          title: "Mem odrzucony",
-          description: `Zawartość nieodpowiednia: ${verificationResult.reason || 'Nieodpowiednia treść'}`,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Upload file to storage
       const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       
@@ -165,42 +128,6 @@ const CommunityMemes = () => {
     }
   };
 
-  const deleteMeme = async (memeId: string, imageUrl: string) => {
-    try {
-      // Extract file name from URL
-      const fileName = imageUrl.split('/').pop();
-      
-      // Delete from storage
-      if (fileName) {
-        await supabase.storage
-          .from('community-memes')
-          .remove([fileName]);
-      }
-      
-      // Delete from database
-      const { error } = await supabase
-        .from('community_memes')
-        .delete()
-        .eq('id', memeId);
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Sukces!",
-        description: "Mem został usunięty"
-      });
-      
-      // Refresh memes
-      fetchMemes();
-    } catch (error) {
-      console.error('Error deleting meme:', error);
-      toast({
-        title: "Błąd",
-        description: "Nie udało się usunąć mema",
-        variant: "destructive"
-      });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -293,23 +220,13 @@ const CommunityMemes = () => {
                       />
                     </div>
                     <CardContent className="p-4">
-                      <div className="flex justify-between items-center">
-                        <div className="text-sm text-muted-foreground">
-                          <div>
-                            {meme.is_anonymous ? 'Anonimowy' : meme.nickname || 'Anonimowy'}
-                          </div>
-                          <div>
-                            {new Date(meme.created_at).toLocaleDateString('pl-PL')}
-                          </div>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deleteMeme(meme.id, meme.image_url)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                      <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <span>
+                          {meme.is_anonymous ? 'Anonimowy' : meme.nickname || 'Anonimowy'}
+                        </span>
+                        <span>
+                          {new Date(meme.created_at).toLocaleDateString('pl-PL')}
+                        </span>
                       </div>
                     </CardContent>
                   </Card>

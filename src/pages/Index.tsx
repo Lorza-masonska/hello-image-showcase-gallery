@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 // Usuń import useGitCommitHash
 import { APP_VERSION } from "@/version"; // Dodaj import wersji
+import AdminPanel from "@/components/AdminPanel";
 
 const Index = () => {
   // Usuń cały kod dotyczący useGitCommitHash
@@ -48,6 +49,7 @@ const Index = () => {
               <div>TikTok: @lorza_masonska</div>
               <div>Instagram: lorzamasonska_</div>
             </div>
+            <AdminPanel />
           </div>
         </div>
       </div>

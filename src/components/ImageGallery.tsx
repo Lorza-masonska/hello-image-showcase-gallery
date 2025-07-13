@@ -22,16 +22,39 @@ const ImageGallery = () => {
         setRefreshing(true);
       }
       
-      // Dodaj timestamp do URL żeby uniknąć cache
-      const timestamp = new Date().getTime();
-      const response = await fetch(`https://api.github.com/repos/Lorza-masonska/Zdjecia/contents?t=${timestamp}`);
+      // Sprawdź cache w localStorage (ważny przez 10 minut)
+      const cacheKey = 'github-images-cache';
+      const cacheTimeKey = 'github-images-cache-time';
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheTime = localStorage.getItem(cacheTimeKey);
+      
+      if (cachedData && cacheTime) {
+        const isExpired = Date.now() - parseInt(cacheTime) > 600000; // 10 minut
+        if (!isExpired && !showRefreshIndicator) {
+          console.log('Loading images from cache');
+          setImages(JSON.parse(cachedData));
+          setError(null);
+          setRateLimited(false);
+          setLoading(false);
+          return;
+        }
+      }
+      
+      console.log('Fetching images from GitHub API');
+      const response = await fetch(`https://api.github.com/repos/Lorza-masonska/Zdjecia/contents`);
       
       if (response.status === 403) {
         const errorData = await response.json();
         if (errorData.message.includes('rate limit')) {
-          console.log('GitHub API rate limit reached. Waiting...');
+          console.log('GitHub API rate limit reached. Using cache if available...');
           setRateLimited(true);
-          setError('Osiągnięto limit API GitHub. Odczekaj chwilę przed odświeżeniem.');
+          setError('Osiągnięto limit API GitHub. Pokazuję ostatnio załadowane zdjęcia.');
+          
+          // Użyj cache nawet jeśli jest expired
+          if (cachedData) {
+            setImages(JSON.parse(cachedData));
+            setError('Limit API GitHub osiągnięty. Pokazuję ostatnio załadowane zdjęcia.');
+          }
           return;
         }
       }
@@ -53,13 +76,25 @@ const ImageGallery = () => {
           url: file.download_url,
           name: file.name
         }));
+      
+      // Zapisz do cache
+      localStorage.setItem(cacheKey, JSON.stringify(imageFiles));
+      localStorage.setItem(cacheTimeKey, Date.now().toString());
         
       setImages(imageFiles);
       setError(null);
       setRateLimited(false);
     } catch (err) {
       console.error('Error fetching images:', err);
-      setError('Failed to load images from repository');
+      
+      // W przypadku błędu, spróbuj użyć cache
+      const cachedData = localStorage.getItem('github-images-cache');
+      if (cachedData) {
+        setImages(JSON.parse(cachedData));
+        setError('Błąd połączenia. Pokazuję ostatnio załadowane zdjęcia.');
+      } else {
+        setError('Failed to load images from repository');
+      }
     } finally {
       setLoading(false);
       if (showRefreshIndicator) {
@@ -71,12 +106,12 @@ const ImageGallery = () => {
   useEffect(() => {
     fetchImages();
     
-    // Zmniejsz częstotliwość automatycznego odświeżania z 30s na 5 minut
+    // Zwiększ częstotliwość automatycznego odświeżania do 15 minut
     const interval = setInterval(() => {
       if (!rateLimited) {
         fetchImages();
       }
-    }, 300000); // 5 minut
+    }, 900000); // 15 minut
     
     return () => clearInterval(interval);
   }, [rateLimited]);
@@ -144,7 +179,7 @@ const ImageGallery = () => {
         <p className="text-red-500 mb-4">{error}</p>
         {rateLimited && (
           <p className="text-yellow-600 mb-4 text-sm">
-            Tip: GitHub API pozwala na 60 żądań na godzinę. Spróbuj ponownie za chwilę.
+            GitHub API pozwala na 60 żądań na godzinę. Zdjęcia są cache'owane przez 10 minut aby zmniejszyć użycie API.
           </p>
         )}
         <button

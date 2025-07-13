@@ -261,6 +261,34 @@ const ImageGallery = () => {
             onClick={closePreview}
           />
           
+          {/* Close Button - Fixed to top-right corner */}
+          <button
+            onClick={closePreview}
+            className="fixed top-6 right-6 z-60 p-3 bg-black/60 text-white rounded-lg hover:bg-black/80 transition-colors touch-manipulation"
+          >
+            <X size={32} />
+          </button>
+          
+          {/* Previous Button - Fixed to left side of screen */}
+          {previewIndex > 0 && (
+            <button
+              onClick={goToPrevious}
+              className="fixed left-6 top-1/2 -translate-y-1/2 z-60 p-4 bg-black/60 text-white rounded-lg hover:bg-black/80 transition-colors touch-manipulation"
+            >
+              <ChevronLeft size={36} />
+            </button>
+          )}
+          
+          {/* Next Button - Fixed to right side of screen */}
+          {previewIndex < images.length - 1 && (
+            <button
+              onClick={goToNext}
+              className="fixed right-6 top-1/2 -translate-y-1/2 z-60 p-4 bg-black/60 text-white rounded-lg hover:bg-black/80 transition-colors touch-manipulation"
+            >
+              <ChevronRight size={36} />
+            </button>
+          )}
+          
           {/* Preview Content */}
           <div className="relative max-w-screen max-h-screen p-4 flex items-center justify-center">
             <img
@@ -268,34 +296,6 @@ const ImageGallery = () => {
               alt={images[previewIndex].name}
               className="max-w-full max-h-full object-contain"
             />
-            
-            {/* Close Button */}
-            <button
-              onClick={closePreview}
-              className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
-            >
-              <X size={24} />
-            </button>
-            
-            {/* Previous Button */}
-            {previewIndex > 0 && (
-              <button
-                onClick={goToPrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
-              >
-                <ChevronLeft size={24} />
-              </button>
-            )}
-            
-            {/* Next Button */}
-            {previewIndex < images.length - 1 && (
-              <button
-                onClick={goToNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
-              >
-                <ChevronRight size={24} />
-              </button>
-            )}
           </div>
         </div>
       )}

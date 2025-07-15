@@ -41,8 +41,10 @@ serve(async (req) => {
 
     // Extract email address from "Name <email@domain.com>" format
     const extractEmail = (emailString: string) => {
+      if (!emailString || typeof emailString !== 'string') return null;
       const match = emailString.match(/<([^>]+)>/);
-      return match ? match[1] : emailString;
+      if (match && match[1]) return match[1];
+      return emailString.trim();
     };
 
     const recipientEmail = extractEmail(to);

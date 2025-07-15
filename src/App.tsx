@@ -10,6 +10,7 @@ import Website from "./pages/Website";
 import Categories from "./pages/Categories";
 import CommunityMemes from "./pages/CommunityMemes";
 import Dashboard from "./pages/Dashboard";
+import TempMail from "./pages/TempMail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/categories" element={<Categories />} />
           <Route path="/community-memes" element={<CommunityMemes />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/temp-mail" element={<TempMail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

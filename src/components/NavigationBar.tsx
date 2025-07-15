@@ -19,12 +19,15 @@ const NavigationBar = () => {
   const isActive = (path: string) => location.pathname === path;
   
   const navItems = [
-    { name: 'Główna', path: '/' },
-    { name: 'Kategorie', path: '/categories' },
     { name: 'O mnie', path: '/about' },
+    { name: 'Kategorie', path: '/categories' },
+    { name: 'Główna', path: '/' },
     { name: 'Community Memy', path: '/community-memes' },
     { name: 'O stronie', path: '/website' },
-    ...(isAdmin ? [{ name: 'Dashboard', path: '/dashboard' }] : [])
+    ...(isAdmin ? [
+      { name: 'Dashboard', path: '/dashboard' },
+      { name: '10 Minute Mail', path: '/temp-mail' }
+    ] : [])
   ];
 
   return (

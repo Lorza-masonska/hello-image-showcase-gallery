@@ -3,12 +3,19 @@ import NavigationBar from "@/components/NavigationBar";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { lastModified } from "@/version";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalMemes: 0,
     todayMemes: 0,
     lastWeekMemes: 0
+  });
+  
+  const [umamiStats, setUmamiStats] = useState({
+    pageViews: 'Niedostępne',
+    visitors: 'Niedostępne',
+    bounceRate: 'Niedostępne'
   });
 
   useEffect(() => {
@@ -58,6 +65,10 @@ const Dashboard = () => {
   const logout = () => {
     localStorage.removeItem('adminAccess');
     window.location.href = '/';
+  };
+
+  const getLastModifiedDate = () => {
+    return `${lastModified.date} ${lastModified.time}`;
   };
 
   const getCurrentDate = () => {
@@ -126,7 +137,7 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Informacje o Stronie</CardTitle>
@@ -134,11 +145,11 @@ const Dashboard = () => {
             <CardContent className="space-y-4">
               <div className="flex justify-between">
                 <span className="font-medium">Wersja strony:</span>
-                <Badge variant="outline">v3.2</Badge>
+                <Badge variant="outline">v{lastModified.version}</Badge>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Ostatnia aktualizacja:</span>
-                <span className="text-gray-600">{getCurrentDate()}</span>
+                <span className="text-gray-600">{getLastModifiedDate()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Status serwera:</span>
@@ -147,6 +158,30 @@ const Dashboard = () => {
               <div className="flex justify-between">
                 <span className="font-medium">Baza danych:</span>
                 <Badge className="bg-blue-100 text-blue-800">Supabase</Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Statystyki Umami</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between">
+                <span className="font-medium">Odsłony strony:</span>
+                <span className="text-gray-600">{umamiStats.pageViews}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Unikalni użytkownicy:</span>
+                <span className="text-gray-600">{umamiStats.visitors}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Współczynnik odrzuceń:</span>
+                <span className="text-gray-600">{umamiStats.bounceRate}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">ID witryny Umami:</span>
+                <span className="text-gray-600 text-xs">526d3380-1be8-4c29-bea9-27f3e76e887d</span>
               </div>
             </CardContent>
           </Card>

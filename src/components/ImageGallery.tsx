@@ -8,117 +8,58 @@ interface ImageItem {
   name: string;
 }
 
+// Import zdjęć statycznie
+import exampleMeme1 from '@/assets/images/example-meme-1.jpg';
+import exampleMeme2 from '@/assets/images/example-meme-2.jpg';
+
+// Lista lokalnych zdjęć
+const getLocalImages = (): ImageItem[] => {
+  const localImages = [
+    {
+      id: 'local-1',
+      url: exampleMeme1,
+      name: 'example-meme-1.jpg'
+    },
+    {
+      id: 'local-2', 
+      url: exampleMeme2,
+      name: 'example-meme-2.jpg'
+    }
+  ];
+  
+  return localImages;
+};
+
 const ImageGallery = () => {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [rateLimited, setRateLimited] = useState(false);
 
-  const fetchImages = async (showRefreshIndicator = false) => {
+  const loadLocalImages = () => {
     try {
-      if (showRefreshIndicator) {
-        setRefreshing(true);
-      }
-      
-      // Sprawdź cache w localStorage (ważny przez 10 minut)
-      const cacheKey = 'github-images-cache';
-      const cacheTimeKey = 'github-images-cache-time';
-      const cachedData = localStorage.getItem(cacheKey);
-      const cacheTime = localStorage.getItem(cacheTimeKey);
-      
-      if (cachedData && cacheTime) {
-        const isExpired = Date.now() - parseInt(cacheTime) > 600000; // 10 minut
-        if (!isExpired && !showRefreshIndicator) {
-          console.log('Loading images from cache');
-          setImages(JSON.parse(cachedData));
-          setError(null);
-          setRateLimited(false);
-          setLoading(false);
-          return;
-        }
-      }
-      
-      console.log('Fetching images from GitHub API');
-      const response = await fetch(`https://api.github.com/repos/Lorza-masonska/Zdjecia/contents`);
-      
-      if (response.status === 403) {
-        const errorData = await response.json();
-        if (errorData.message.includes('rate limit')) {
-          console.log('GitHub API rate limit reached. Using cache if available...');
-          setRateLimited(true);
-          setError('Osiągnięto limit API GitHub. Pokazuję ostatnio załadowane zdjęcia.');
-          
-          // Użyj cache nawet jeśli jest expired
-          if (cachedData) {
-            setImages(JSON.parse(cachedData));
-            setError('Limit API GitHub osiągnięty. Pokazuję ostatnio załadowane zdjęcia.');
-          }
-          return;
-        }
-      }
-        
-      if (!response.ok) {
-        throw new Error('Failed to fetch images from repository');
-      }
-        
-      const files = await response.json();
-        
-      // Filter for image files and create image items
-      const imageFiles = files
-        .filter((file: any) => 
-          file.type === 'file' && 
-          /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(file.name)
-        )
-        .map((file: any) => ({
-          id: file.sha,
-          url: file.download_url,
-          name: file.name
-        }));
-      
-      // Zapisz do cache
-      localStorage.setItem(cacheKey, JSON.stringify(imageFiles));
-      localStorage.setItem(cacheTimeKey, Date.now().toString());
-        
-      setImages(imageFiles);
+      setLoading(true);
+      const localImages = getLocalImages();
+      setImages(localImages);
       setError(null);
-      setRateLimited(false);
+      console.log(`Załadowano ${localImages.length} lokalnych zdjęć`);
     } catch (err) {
-      console.error('Error fetching images:', err);
-      
-      // W przypadku błędu, spróbuj użyć cache
-      const cachedData = localStorage.getItem('github-images-cache');
-      if (cachedData) {
-        setImages(JSON.parse(cachedData));
-        setError('Błąd połączenia. Pokazuję ostatnio załadowane zdjęcia.');
-      } else {
-        setError('Failed to load images from repository');
-      }
+      console.error('Error loading local images:', err);
+      setError('Błąd przy ładowaniu zdjęć z lokalnego folderu');
     } finally {
       setLoading(false);
-      if (showRefreshIndicator) {
-        setRefreshing(false);
-      }
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
-    fetchImages();
-    
-    // Zwiększ częstotliwość automatycznego odświeżania do 15 minut
-    const interval = setInterval(() => {
-      if (!rateLimited) {
-        fetchImages();
-      }
-    }, 900000); // 15 minut
-    
-    return () => clearInterval(interval);
-  }, [rateLimited]);
+    loadLocalImages();
+  }, []);
 
   const handleManualRefresh = () => {
-    setRateLimited(false);
-    fetchImages(true);
+    setRefreshing(true);
+    loadLocalImages();
   };
 
   const openPreview = (index: number) => {
@@ -177,11 +118,6 @@ const ImageGallery = () => {
     return (
       <div className="text-center py-12">
         <p className="text-red-500 mb-4">{error}</p>
-        {rateLimited && (
-          <p className="text-yellow-600 mb-4 text-sm">
-            GitHub API pozwala na 60 żądań na godzinę. Zdjęcia są cache'owane przez 10 minut aby zmniejszyć użycie API.
-          </p>
-        )}
         <button
           onClick={handleManualRefresh}
           disabled={refreshing}
@@ -203,7 +139,7 @@ const ImageGallery = () => {
       <div className="w-full max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">
-            Galeria ({images.length} zdjęć)
+            Galeria lokalnych zdjęć ({images.length} zdjęć)
           </h2>
           <button
             onClick={handleManualRefresh}
@@ -240,7 +176,8 @@ const ImageGallery = () => {
           </div>
         ) : (
           <div className="text-center text-gray-500 py-12">
-            <p>Nie znaleziono zdjęć w repozytorium.</p>
+            <p>Nie znaleziono zdjęć w lokalnym folderze.</p>
+            <p className="text-sm mt-2">Dodaj zdjęcia do folderu src/assets/images/</p>
             <button
               onClick={handleManualRefresh}
               className="mt-4 inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"

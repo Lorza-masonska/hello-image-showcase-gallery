@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NavigationBar from '@/components/NavigationBar';
-import { Copy, RefreshCw, Mail } from 'lucide-react';
+import { Copy, RefreshCw, Mail, RotateCcw } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -246,8 +246,17 @@ const TempMail = () => {
 
               {/* Inbox Section */}
               <div className="border rounded-lg">
-                <div className="bg-gray-50 px-4 py-3 border-b">
+                <div className="bg-gray-50 px-4 py-3 border-b flex justify-between items-center">
                   <h3 className="font-semibold">Skrzynka odbiorcza</h3>
+                  <Button
+                    onClick={fetchEmails}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Odśwież
+                  </Button>
                 </div>
                 
                 <div className="p-4">

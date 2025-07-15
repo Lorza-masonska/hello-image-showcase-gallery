@@ -8,29 +8,30 @@ interface ImageItem {
   name: string;
 }
 
-// Automatyczne importowanie wszystkich zdjęć z folderu assets/images
-const importAll = (r: any): ImageItem[] => {
-  const images: ImageItem[] = [];
-  r.keys().forEach((item: string, index: number) => {
-    const imageName = item.replace('./', '');
-    // Pomijamy README.md i inne pliki tekstowe
-    if (imageName.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-      images.push({
-        id: `local-${index}`,
-        url: r(item).default || r(item),
-        name: imageName
-      });
-    }
-  });
-  return images;
-};
-
-// Lista lokalnych zdjęć
+// Lista lokalnych zdjęć z folderu assets/images
 const getLocalImages = (): ImageItem[] => {
   try {
-    // @ts-ignore - webpack require.context
-    const context = require.context('@/assets/images', false, /\.(jpg|jpeg|png|gif|webp)$/i);
-    return importAll(context);
+    // Użyj import.meta.glob do importowania wszystkich zdjęć z folderu
+    const imageModules = import.meta.glob('@/assets/images/*.{png,jpg,jpeg,gif,webp}', { 
+      eager: true,
+      as: 'url'
+    });
+    
+    const images: ImageItem[] = [];
+    
+    Object.entries(imageModules).forEach(([path, module], index) => {
+      const imageName = path.replace('@/assets/images/', '');
+      // Pomijamy README.md i inne pliki tekstowe
+      if (imageName.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        images.push({
+          id: `local-${index}`,
+          url: module as string,
+          name: imageName
+        });
+      }
+    });
+    
+    return images;
   } catch (error) {
     console.error('Error loading images from assets folder:', error);
     return [];

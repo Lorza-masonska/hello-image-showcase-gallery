@@ -139,7 +139,7 @@ const ImageGallery = () => {
       <div className="w-full max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">
-            Galeria lokalnych zdjęć ({images.length} zdjęć)
+            Galeria ({images.length} zdjęć)
           </h2>
           <button
             onClick={handleManualRefresh}

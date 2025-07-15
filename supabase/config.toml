@@ -1,1 +1,4 @@
 project_id = "movyoqalilebfrfopwnw"
+
+[functions.umami-stats]
+verify_jwt = false

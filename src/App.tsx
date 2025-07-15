@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Website from "./pages/Website";
+import Categories from "./pages/Categories";
 import CommunityMemes from "./pages/CommunityMemes";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/website" element={<Website />} />
+          <Route path="/categories" element={<Categories />} />
           <Route path="/community-memes" element={<CommunityMemes />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />

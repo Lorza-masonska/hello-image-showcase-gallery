@@ -15,6 +15,7 @@ const NavigationBar = () => {
   const navItems = [
     { name: 'O mnie', path: '/about' },
     { name: 'Główna', path: '/' },
+    { name: 'Kategorie', path: '/categories' },
     { name: 'Community Memy', path: '/community-memes' },
     { name: 'O stronie', path: '/website' },
     ...(isAdmin ? [{ name: 'Dashboard', path: '/dashboard' }] : [])

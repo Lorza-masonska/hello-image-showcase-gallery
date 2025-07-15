@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import NavigationBar from '@/components/NavigationBar';
 import { Copy, RefreshCw, Mail } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const TempMail = () => {
   const [customName, setCustomName] = useState('');
@@ -11,6 +12,7 @@ const TempMail = () => {
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
   const [showEmailInterface, setShowEmailInterface] = useState(false);
   const [emails, setEmails] = useState([]);
+  const [tempEmailId, setTempEmailId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -19,13 +21,7 @@ const TempMail = () => {
       interval = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            setShowEmailInterface(false);
-            setCurrentEmail('');
-            toast({
-              title: "Mail wygasł",
-              description: "Twój tymczasowy mail został usunięty",
-              variant: "destructive"
-            });
+            handleEmailExpired();
             return 0;
           }
           return prev - 1;
@@ -33,9 +29,63 @@ const TempMail = () => {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [showEmailInterface, timeLeft, toast]);
+  }, [showEmailInterface, timeLeft]);
 
-  const generateEmail = () => {
+  // Fetch emails when email interface is shown
+  useEffect(() => {
+    if (showEmailInterface && tempEmailId) {
+      fetchEmails();
+    }
+  }, [showEmailInterface, tempEmailId]);
+
+  // Polling for new emails
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout;
+    if (tempEmailId && showEmailInterface) {
+      pollInterval = setInterval(async () => {
+        await fetchEmails();
+      }, 5000); // Check for new emails every 5 seconds
+    }
+    return () => clearInterval(pollInterval);
+  }, [tempEmailId, showEmailInterface]);
+
+  const handleEmailExpired = async () => {
+    if (tempEmailId) {
+      // Clean up expired email from database
+      await supabase
+        .from('temp_emails')
+        .delete()
+        .eq('id', tempEmailId);
+    }
+    
+    setShowEmailInterface(false);
+    setCurrentEmail('');
+    setTempEmailId(null);
+    toast({
+      title: "Mail wygasł",
+      description: "Twój tymczasowy mail został usunięty",
+      variant: "destructive"
+    });
+  };
+
+  const fetchEmails = async () => {
+    if (!tempEmailId) return;
+
+    const { data, error } = await supabase
+      .from('temp_email_messages')
+      .select('*')
+      .eq('temp_email_id', tempEmailId)
+      .order('received_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching emails:', error);
+      return;
+    }
+
+    setEmails(data || []);
+  };
+
+  const generateEmail = async () => {
     if (!customName.trim()) {
       toast({
         title: "Błąd",
@@ -46,7 +96,46 @@ const TempMail = () => {
     }
 
     const email = `${customName.trim()}@lorza.pl`;
+    
+    // Check if email already exists
+    const { data: existingEmail } = await supabase
+      .from('temp_emails')
+      .select('id')
+      .eq('email_address', email)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (existingEmail) {
+      toast({
+        title: "Błąd",
+        description: "Ten adres email jest już w użyciu",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create new temp email
+    const { data, error } = await supabase
+      .from('temp_emails')
+      .insert([{
+        email_address: email,
+        is_active: true
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating temp email:', error);
+      toast({
+        title: "Błąd",
+        description: "Nie udało się utworzyć tymczasowego maila",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setCurrentEmail(email);
+    setTempEmailId(data.id);
     setTimeLeft(600);
     setShowEmailInterface(true);
     setEmails([]);
@@ -65,17 +154,31 @@ const TempMail = () => {
     });
   };
 
-  const generateNewMail = () => {
+  const generateNewMail = async () => {
+    // Clean up current email
+    if (tempEmailId) {
+      await supabase
+        .from('temp_emails')
+        .delete()
+        .eq('id', tempEmailId);
+    }
+
     setShowEmailInterface(false);
     setCurrentEmail('');
     setCustomName('');
     setTimeLeft(600);
+    setTempEmailId(null);
+    setEmails([]);
   };
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('pl-PL');
   };
 
   return (
@@ -159,11 +262,13 @@ const TempMail = () => {
                       {emails.map((email: any, index) => (
                         <div key={index} className="border rounded p-3 hover:bg-gray-50">
                           <div className="flex justify-between items-start mb-1">
-                            <span className="font-semibold">{email.from}</span>
-                            <span className="text-sm text-gray-500">{email.time}</span>
+                            <span className="font-semibold">{email.sender_name || email.sender_email}</span>
+                            <span className="text-sm text-gray-500">{formatDate(email.received_at)}</span>
                           </div>
                           <div className="text-sm font-medium mb-1">{email.subject}</div>
-                          <div className="text-sm text-gray-600">{email.preview}</div>
+                          <div className="text-sm text-gray-600">
+                            {email.body_text ? email.body_text.substring(0, 100) + '...' : 'Brak treści'}
+                          </div>
                         </div>
                       ))}
                     </div>

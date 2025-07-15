@@ -65,6 +65,71 @@ export type Database = {
         }
         Relationships: []
       }
+      temp_email_messages: {
+        Row: {
+          body_html: string | null
+          body_text: string | null
+          id: string
+          received_at: string
+          sender_email: string
+          sender_name: string | null
+          subject: string
+          temp_email_id: string
+        }
+        Insert: {
+          body_html?: string | null
+          body_text?: string | null
+          id?: string
+          received_at?: string
+          sender_email: string
+          sender_name?: string | null
+          subject: string
+          temp_email_id: string
+        }
+        Update: {
+          body_html?: string | null
+          body_text?: string | null
+          id?: string
+          received_at?: string
+          sender_email?: string
+          sender_name?: string | null
+          subject?: string
+          temp_email_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "temp_email_messages_temp_email_id_fkey"
+            columns: ["temp_email_id"]
+            isOneToOne: false
+            referencedRelation: "temp_emails"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      temp_emails: {
+        Row: {
+          created_at: string
+          email_address: string
+          expires_at: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          created_at?: string
+          email_address: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          created_at?: string
+          email_address?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -91,6 +156,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_temp_emails: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       is_admin: {
         Args: { user_id?: string }
         Returns: boolean

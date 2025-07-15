@@ -54,19 +54,9 @@ const Categories = () => {
     loadAvailableImages();
   }, []);
 
-  const checkAdminStatus = async () => {
-    try {
-      const { data, error } = await supabase.rpc('is_admin');
-      if (error) {
-        console.error('Error checking admin status:', error);
-        setIsAdmin(false);
-      } else {
-        setIsAdmin(data === true);
-      }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
-    }
+  const checkAdminStatus = () => {
+    const adminAccess = localStorage.getItem('adminAccess') === 'true';
+    setIsAdmin(adminAccess);
   };
 
   const fetchCategories = async () => {

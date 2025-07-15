@@ -27,6 +27,7 @@ const Dashboard = () => {
     }
 
     fetchStats();
+    fetchUmamiStats();
   }, []);
 
   const fetchStats = async () => {
@@ -59,6 +60,34 @@ const Dashboard = () => {
       });
     } catch (error) {
       console.error('Błąd przy pobieraniu statystyk:', error);
+    }
+  };
+
+  const fetchUmamiStats = async () => {
+    try {
+      const websiteId = '526d3380-1be8-4c29-bea9-27f3e76e887d';
+      const apiKey = 'api_jNEKWAood5u6XadDpIhbBbh7ayAeECY8';
+      
+      const endAt = Date.now();
+      const startAt = endAt - (30 * 24 * 60 * 60 * 1000); // 30 dni temu
+      
+      const response = await fetch(`https://cloud.umami.is/api/websites/${websiteId}/stats?startAt=${startAt}&endAt=${endAt}`, {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Accept': 'application/json',
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUmamiStats({
+          pageViews: data.pageviews?.value?.toLocaleString() || 'Niedostępne',
+          visitors: data.visitors?.value?.toLocaleString() || 'Niedostępne', 
+          bounceRate: data.bounces?.value ? `${Math.round((data.bounces.value / data.visits.value) * 100)}%` : 'Niedostępne'
+        });
+      }
+    } catch (error) {
+      console.error('Błąd przy pobieraniu statystyk Umami:', error);
     }
   };
 

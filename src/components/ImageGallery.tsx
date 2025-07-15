@@ -8,26 +8,33 @@ interface ImageItem {
   name: string;
 }
 
-// Import zdjęć statycznie
-import exampleMeme1 from '@/assets/images/example-meme-1.jpg';
-import exampleMeme2 from '@/assets/images/example-meme-2.jpg';
+// Automatyczne importowanie wszystkich zdjęć z folderu assets/images
+const importAll = (r: any): ImageItem[] => {
+  const images: ImageItem[] = [];
+  r.keys().forEach((item: string, index: number) => {
+    const imageName = item.replace('./', '');
+    // Pomijamy README.md i inne pliki tekstowe
+    if (imageName.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+      images.push({
+        id: `local-${index}`,
+        url: r(item).default || r(item),
+        name: imageName
+      });
+    }
+  });
+  return images;
+};
 
 // Lista lokalnych zdjęć
 const getLocalImages = (): ImageItem[] => {
-  const localImages = [
-    {
-      id: 'local-1',
-      url: exampleMeme1,
-      name: 'example-meme-1.jpg'
-    },
-    {
-      id: 'local-2', 
-      url: exampleMeme2,
-      name: 'example-meme-2.jpg'
-    }
-  ];
-  
-  return localImages;
+  try {
+    // @ts-ignore - webpack require.context
+    const context = require.context('@/assets/images', false, /\.(jpg|jpeg|png|gif|webp)$/i);
+    return importAll(context);
+  } catch (error) {
+    console.error('Error loading images from assets folder:', error);
+    return [];
+  }
 };
 
 const ImageGallery = () => {

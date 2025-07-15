@@ -1,21 +1,37 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
 
 const NavigationBar = () => {
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
   
   useEffect(() => {
-    setIsAdmin(localStorage.getItem('adminAccess') === 'true');
+    checkAdminStatus();
   }, []);
+
+  const checkAdminStatus = async () => {
+    try {
+      const { data, error } = await supabase.rpc('is_admin');
+      if (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(data === true);
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
+    }
+  };
   
   const isActive = (path: string) => location.pathname === path;
   
   const navItems = [
-    { name: 'O mnie', path: '/about' },
     { name: 'Główna', path: '/' },
     { name: 'Kategorie', path: '/categories' },
+    { name: 'O mnie', path: '/about' },
     { name: 'Community Memy', path: '/community-memes' },
     { name: 'O stronie', path: '/website' },
     ...(isAdmin ? [{ name: 'Dashboard', path: '/dashboard' }] : [])

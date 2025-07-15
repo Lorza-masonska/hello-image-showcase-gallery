@@ -49,10 +49,25 @@ const Categories = () => {
   const [availableImages, setAvailableImages] = useState<Image[]>([]);
 
   useEffect(() => {
-    setIsAdmin(localStorage.getItem('adminAccess') === 'true');
+    checkAdminStatus();
     fetchCategories();
     loadAvailableImages();
   }, []);
+
+  const checkAdminStatus = async () => {
+    try {
+      const { data, error } = await supabase.rpc('is_admin');
+      if (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(data === true);
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
